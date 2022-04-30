@@ -1,0 +1,80 @@
+package main
+
+import (
+	"github.com/ngergs/timetrack/states"
+	"github.com/stretchr/testify/assert"
+	"math"
+	"testing"
+	"time"
+)
+
+func TestStartStopSession(t *testing.T) {
+	sheet := newTimesheet()
+	// empty sheets are not allowed during normal operation
+	validateExpectError(t, sheet)
+	assert.Equal(t, 0, len(sheet.Slices))
+	assert.Equal(t, states.Closed, sheet.getState())
+	startSessionExpectOk(t, sheet, 0)
+
+	// starting a second session is not possible while on is running
+	err := sheet.StartSession()
+	validateExpectOk(t, sheet)
+	assert.NotNil(t, err)
+	assert.Equal(t, 1, len(sheet.Slices))
+	assert.Equal(t, states.Open, sheet.getState())
+
+	// stopping the session should work
+	err = sheet.StopSession()
+	validateExpectOk(t, sheet)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(sheet.Slices))
+	assert.Equal(t, states.Closed, sheet.getState())
+	assert.NotNil(t, sheet.Slices[0].End)
+	assert.Less(t, time.Now().Sub(*sheet.Slices[0].End).Milliseconds(), int64(100))
+
+	// double stop should fail
+	err = sheet.StopSession()
+	validateExpectOk(t, sheet)
+	assert.NotNil(t, err)
+	assert.Equal(t, 1, len(sheet.Slices))
+	assert.Equal(t, states.Closed, sheet.getState())
+
+	// starting a second session should now work
+	startSessionExpectOk(t, sheet, 1)
+}
+
+func TestBalance(t *testing.T) {
+	timeDifference := time.Duration(42)*time.Second + time.Duration(12)*time.Minute + time.Duration(7)*time.Hour
+	startTime := time.Now().Add(-timeDifference)
+	endTime := time.Now()
+	// update timeDifference to take nanoSeconds drift into account
+	timeDifference = endTime.Sub(startTime)
+
+	sheet := newTimesheet()
+	sheet.Slices = append(sheet.Slices, timeslice{
+		Start: &startTime,
+		End:   &endTime,
+	})
+	assert.Equal(t, int(math.Floor(timeDifference.Minutes())), sheet.getTodayBalance())
+}
+
+func startSessionExpectOk(t *testing.T, sheet *timesheet, expectedSessionCount int) {
+	err := sheet.StartSession()
+	validateExpectOk(t, sheet)
+	assert.Nil(t, err)
+	assert.Equal(t, expectedSessionCount+1, len(sheet.Slices))
+	assert.Equal(t, states.Open, sheet.getState())
+	assert.NotNil(t, sheet.Slices[expectedSessionCount].Start)
+	assert.Nil(t, sheet.Slices[expectedSessionCount].End)
+	assert.Less(t, time.Now().Sub(*sheet.Slices[expectedSessionCount].Start).Milliseconds(), int64(100))
+}
+
+func validateExpectOk(t *testing.T, sheet *timesheet) {
+	err := sheet.Validate()
+	assert.Nil(t, err)
+}
+
+func validateExpectError(t *testing.T, sheet *timesheet) {
+	err := sheet.Validate()
+	assert.NotNil(t, err)
+}
