@@ -5,7 +5,7 @@ for the tracked time sheets (default is ~/.timetrack).
 
 ## Installation
 ### Binary
-Each release has pre-compiled binaries for linux/osx/windows attached. Just download and use them.
+Each release has pre-compiled binaries for linux/osx/windows attached. You can just download and use them :)
 
 ### Building from source
 Clone this repository and run (with go v1.18+ installed)
