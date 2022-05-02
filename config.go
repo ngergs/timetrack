@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+var compactPrint = flag.Bool("compact", false, "whether the status should be printed in a compact format omitting timesheet details")
 var folder = flag.String("folder", "~/.timetrack/", "folder in which the timeekeep time slice are saved")
 var dailyWorkingMinutes = flag.Int("working-minutes", 480, "daily working minutes to update the time balance")
 var prettyLogging = flag.Bool("pretty", true, "Activates zerolog pretty logging")

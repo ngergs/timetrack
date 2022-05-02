@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/ngergs/timetrack/modes"
 	"github.com/ngergs/timetrack/states"
 	"github.com/rs/zerolog/log"
+	"os"
+	"text/tabwriter"
 	"time"
 )
 
@@ -15,13 +18,13 @@ func main() {
 	timesheetLogic(sheet)
 }
 
+const timeFormat string = "2006-02-01 15:04:05 MST"
+
 func timesheetLogic(sheet *timesheet) {
 	var err error
 	switch mode {
 	case modes.Status:
-		log.Info().Msgf("Current session: %s", sheet.getState().String())
-		log.Info().Msgf("Start day balance: %dh%dmin", sheet.Balance/60, abs(sheet.Balance)%60)
-		log.Info().Msgf("Worked today: %dh%dmin", sheet.getTodayBalance()/60, abs(sheet.getTodayBalance())%60)
+		printStatus(sheet)
 		return
 	case modes.Start:
 		err = sheet.StartSession()
@@ -72,6 +75,26 @@ func prepareNewFromOldSheet(sheet *timesheet) *timesheet {
 		oldSheet.Save()
 	}
 	return sheet
+}
+
+func printStatus(sheet *timesheet) {
+	statW := tabwriter.NewWriter(os.Stdout, 20, 20, 0, ' ', 0)
+	fmt.Fprintf(statW, "Start day balance\t%dh%dmin\t\n", sheet.Balance/60, abs(sheet.Balance)%60)
+	fmt.Fprintf(statW, "Worked today\t%dh%dmin\t\n", sheet.getTodayBalance()/60, abs(sheet.getTodayBalance())%60)
+	fmt.Fprintf(statW, "Current session\t%s\t\n", sheet.getState().String())
+	statW.Flush()
+	if !*compactPrint {
+		sliceW := tabwriter.NewWriter(os.Stdout, 28, 28, 0, ' ', 0)
+		fmt.Fprintf(sliceW, "\nStart\tEnd\n")
+		for _, slice := range sheet.Slices {
+			fmt.Fprintf(sliceW, "%s\t", slice.Start.Format(timeFormat))
+			if slice.End != nil {
+				fmt.Fprintf(sliceW, "%s", slice.End.Format(timeFormat))
+			}
+			fmt.Fprint(sliceW, "\t\n")
+			sliceW.Flush()
+		}
+	}
 }
 
 func abs(x int) int {
