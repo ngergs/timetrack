@@ -18,19 +18,22 @@ Three operation modes are supported:
  - start: Starts a new time tracking session.
  - stop: Stops a previously started session.
  - status: Prints the time tracking session status, the total working hour balance as well as the hours worked today.
+ - sheet YYYY-MM-dd: Prints the status command from the retrospective perspective of the specified day (a time sheet has to exist for that day).
 
 Further options:
 ```
-Usage: ./timetrack {options} (start|stop|status)
+Usage: ./timetrack {options} (start|stop|status|sheet {date YYYY-MM-DD})
 Options:
+  -compact
+    	whether the status should be printed in a compact format omitting timesheet details
   -debug
-        Log debug level
+    	Log debug level
   -folder string
-        folder in which the timeekeep time slice are saved (default "~/.timetrack/")
+    	folder in which the timeekeep time slice are saved (default "~/.timetrack/")
   -help
-        Prints the help.
+    	Prints the help.
   -pretty
-        Activates zerolog pretty logging (default true)
+    	Activates zerolog pretty logging (default true)
   -working-minutes int
-        daily working minutes to update the time balance (default 480)
+    	daily working minutes to update the time balance (default 480)
 ```

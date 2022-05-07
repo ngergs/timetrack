@@ -20,13 +20,32 @@ var help = flag.Bool("help", false, "Prints the help.")
 var mode modes.Mode
 var resolvedFolder string
 
+func getArgs(expectedLength int) []string {
+	args := flag.Args()
+	if len(args) != expectedLength {
+		log.Error().Msgf("Unexpected number of arguments: %d, expected %d", len(args), expectedLength)
+		flag.Usage()
+		os.Exit(1)
+	}
+	return args
+}
+func getArgsMinLength(minLength int) []string {
+	args := flag.Args()
+	if len(args) < minLength {
+		log.Error().Msgf("Unexpected number of arguments: %d, expected more or equal than %d", len(args), minLength)
+		flag.Usage()
+		os.Exit(1)
+	}
+	return args
+}
+
 func readConfig() {
 	if *prettyLogging {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s {options} (start|stop|status)\nOptions:\n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage: %s {options} (start|stop|status|sheet {date YYYY-MM-DD})\nOptions:\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -41,12 +60,7 @@ func readConfig() {
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	}
 
-	args := flag.Args()
-	if len(args) != 1 {
-		log.Error().Msgf("Unexpected number of arguments: %d", len(args))
-		flag.Usage()
-		os.Exit(1)
-	}
+	args := getArgsMinLength(1)
 	var ok bool
 	mode, ok = modes.Parse(args[0])
 	if !ok {

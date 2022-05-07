@@ -6,23 +6,41 @@ import (
 	"github.com/ngergs/timetrack/states"
 	"github.com/rs/zerolog/log"
 	"os"
+	"path"
 	"text/tabwriter"
 	"time"
 )
 
 const referenceFormat string = "2006-01-02.json"
+const timeFormat string = "2006-01-02 15:04:05 MST"
+const dateOnlyFormat string = "2006-01-02"
 
 func main() {
 	readConfig()
-	sheet := getCurrentTimesheet(resolvedFolder)
+	var sheet *timesheet
+	if mode == modes.Sheet {
+		args := getArgs(2)
+		queriedTime, err := time.Parse(dateOnlyFormat, args[1])
+		if err != nil {
+			log.Fatal().Err(err).Msg("Invalid time format, should be YYYY-MM-DD")
+		}
+		sheet, err = read[timesheet](path.Join(resolvedFolder, queriedTime.Format(referenceFormat)))
+		if err != nil {
+			log.Fatal().Err(err).Msg("Could not load timesheet")
+		}
+	} else {
+		getArgs(1) // just to check the length
+		sheet = getCurrentTimesheet(resolvedFolder)
+	}
+
 	timesheetLogic(sheet)
 }
-
-const timeFormat string = "2006-02-01 15:04:05 MST"
 
 func timesheetLogic(sheet *timesheet) {
 	var err error
 	switch mode {
+	case modes.Sheet:
+		fallthrough
 	case modes.Status:
 		printStatus(sheet)
 		return
