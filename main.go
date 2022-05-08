@@ -38,11 +38,13 @@ func main() {
 
 func timesheetLogic(sheet *timesheet) {
 	var err error
+	date := time.Now() // referenced date of the timesheet, only relevant for sheet and status
 	switch mode {
 	case modes.Sheet:
+		date = *sheet.Slices[0].Start // guaranteed to be present as sheet mode only works if a timesheet for that day is present
 		fallthrough
 	case modes.Status:
-		printStatus(sheet)
+		printStatus(sheet, date)
 		return
 	case modes.Start:
 		err = sheet.StartSession()
@@ -95,9 +97,10 @@ func prepareNewFromOldSheet(sheet *timesheet) *timesheet {
 	return sheet
 }
 
-func printStatus(sheet *timesheet) {
+func printStatus(sheet *timesheet, date time.Time) {
 	statW := tabwriter.NewWriter(os.Stdout, 20, 20, 0, ' ', 0)
-	fmt.Fprintf(statW, "Start day balance\t%dh%dmin\t\n", sheet.Balance/60, abs(sheet.Balance)%60)
+	fmt.Fprintf(statW, "Date:\t%s\n", date.Format(dateOnlyFormat))
+	fmt.Fprintf(statW, "Start date balance\t%dh%dmin\t\n", sheet.Balance/60, abs(sheet.Balance)%60)
 	fmt.Fprintf(statW, "Worked today\t%dh%dmin\t\n", sheet.getTodayBalance()/60, abs(sheet.getTodayBalance())%60)
 	fmt.Fprintf(statW, "Current session\t%s\t\n", sheet.getState().String())
 	statW.Flush()
