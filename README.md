@@ -34,6 +34,8 @@ Options:
     	Prints the help.
   -pretty
     	Activates zerolog pretty logging (default true)
+  -version
+        Prints the version of this program
   -working-minutes int
     	daily working minutes to update the time balance (default 480)
 ```

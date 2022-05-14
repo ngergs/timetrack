@@ -10,12 +10,14 @@ import (
 	"strings"
 )
 
+var version = "snapshot"
 var compactPrint = flag.Bool("compact", false, "whether the status should be printed in a compact format omitting timesheet details")
 var folder = flag.String("folder", "~/.timetrack/", "folder in which the timeekeep time slice are saved")
 var dailyWorkingMinutes = flag.Int("working-minutes", 480, "daily working minutes to update the time balance")
 var prettyLogging = flag.Bool("pretty", true, "Activates zerolog pretty logging")
 var debugLogging = flag.Bool("debug", false, "Log debug level")
 var help = flag.Bool("help", false, "Prints the help.")
+var printVersion = flag.Bool("version", false, "Prints the version of this program")
 
 var mode modes.Mode
 var resolvedFolder string
@@ -52,6 +54,10 @@ func readConfig() {
 
 	if *help {
 		flag.Usage()
+		os.Exit(0)
+	}
+	if *printVersion {
+		fmt.Fprintf(flag.CommandLine.Output(), "Version: %s\n", version)
 		os.Exit(0)
 	}
 	if *debugLogging {

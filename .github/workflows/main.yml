@@ -55,7 +55,7 @@ jobs:
       - name: Build
         if: steps.semrel.outputs.version != ''
         run: |
-          CGO_ENABLED=0 go build -a -ldflags '-s -w' -o "$BINARY_NAME"
+          CGO_ENABLED=0 go build -a -ldflags "-s -w -X 'main.version='v${{ steps.semrel.outputs.version }}" -o "$BINARY_NAME"
       - name: Release with Notes
         uses: softprops/action-gh-release@v1
         if: steps.semrel.outputs.version != ''
