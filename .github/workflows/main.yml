@@ -1,4 +1,8 @@
 name: release
+
+env:
+  go-version: '^1.18.3'
+
 on:
   push:
     branches: [ main ]
@@ -13,7 +17,7 @@ jobs:
       - name: Run tests
         uses: ngergs/composite-actions/go-test@main
         with:
-          go-version: '^1.18.0'
+          go-version: ${{ env.go-version }}
       - name: Determine release
         uses:  ngergs/composite-actions/prepare-semantic-release@main
         id: semrel
@@ -42,7 +46,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           binary-name: timetrack
-          go-version: '^1.18.0'
+          go-version: ${{ env.go-version }}
           go-os: ${{ matrix.go-os }}
           go-arch: ${{ matrix.go-arch }}
           release-version: ${{ needs.test-and-pre-release.outputs.version }}
@@ -66,7 +70,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           binary-name: timetrack
-          go-version: '^1.18.0'
+          go-version: ${{ env.go-version }}
           go-os: ${{ matrix.go-os }}
           go-arch: ${{ matrix.go-arch }}
           release-version: ${{ needs.test-and-pre-release.outputs.version }}
