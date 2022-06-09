@@ -52,15 +52,15 @@ func (sheet *timesheet) getState() states.State {
 }
 
 func (sheet *timesheet) getTodayBalance() int {
-	balance := 0
+	var balance float64
 	for _, entry := range sheet.Slices {
 		if entry.End != nil {
-			balance += int(math.Floor(entry.End.Sub(*entry.Start).Minutes()))
+			balance += entry.End.Sub(*entry.Start).Minutes()
 		} else {
-			balance += int(math.Floor(time.Now().Sub(*entry.Start).Minutes()))
+			balance += time.Now().Sub(*entry.Start).Minutes()
 		}
 	}
-	return balance
+	return int(math.Floor(balance))
 }
 
 func (sheet *timesheet) Save() error {
