@@ -1,48 +1,49 @@
-package main
+package sheet
 
 import (
 	"fmt"
-	"github.com/ngergs/timetrack/states"
+	"github.com/ngergs/timetrack/v2/constants"
+	"github.com/ngergs/timetrack/v2/sheet/states"
 	"math"
 	"path"
 	"time"
 )
 
-type timeslice struct {
+type Timeslice struct {
 	Start *time.Time `json:"start"`
 	End   *time.Time `json:"end"`
 }
 
-type timesheet struct {
+type Timesheet struct {
 	Balance int         `json:"balanceInMinutes"`
-	Slices  []timeslice `json:"slices"`
+	Slices  []Timeslice `json:"slices"`
 }
 
-func newTimesheet() *timesheet {
-	return &timesheet{
-		Slices: make([]timeslice, 0),
+func newTimesheet() *Timesheet {
+	return &Timesheet{
+		Slices: make([]Timeslice, 0),
 	}
 }
 
-func (sheet *timesheet) StartSession() error {
-	if sheet.getState() != states.Closed {
-		return fmt.Errorf("current timesheet has an open session, cannot start a new one")
+func (sheet *Timesheet) BeginSession() error {
+	if sheet.GetState() != states.Closed {
+		return fmt.Errorf("current Timesheet has an open session, cannot start a new one")
 	}
 	now := time.Now()
-	sheet.Slices = append(sheet.Slices, timeslice{Start: &now})
+	sheet.Slices = append(sheet.Slices, Timeslice{Start: &now})
 	return nil
 }
 
-func (sheet *timesheet) StopSession() error {
-	if sheet.getState() != states.Open {
-		return fmt.Errorf("current timesheet has no open session, therefore it cannot be closed")
+func (sheet *Timesheet) EndSession() error {
+	if sheet.GetState() != states.Open {
+		return fmt.Errorf("current Timesheet has no open session, therefore it cannot be closed")
 	}
 	now := time.Now()
 	sheet.Slices[len(sheet.Slices)-1].End = &now
 	return nil
 }
 
-func (sheet *timesheet) getState() states.State {
+func (sheet *Timesheet) GetState() states.State {
 	if len(sheet.Slices) == 0 ||
 		sheet.Slices[len(sheet.Slices)-1].End != nil {
 		return states.Closed
@@ -51,7 +52,7 @@ func (sheet *timesheet) getState() states.State {
 	}
 }
 
-func (sheet *timesheet) getTodayBalance() int {
+func (sheet *Timesheet) GetTodayBalance() int {
 	var balance float64
 	for _, entry := range sheet.Slices {
 		if entry.End != nil {
@@ -63,12 +64,12 @@ func (sheet *timesheet) getTodayBalance() int {
 	return int(math.Floor(balance))
 }
 
-func (sheet *timesheet) Save() error {
-	savename := sheet.Slices[0].Start.Format(referenceFormat)
-	return write(path.Join(resolvedFolder, savename), sheet)
+func (sheet *Timesheet) Save(folder string) error {
+	savename := sheet.Slices[0].Start.Format(constants.ReferenceFormat)
+	return Write(path.Join(folder, savename), sheet)
 }
 
-func (sheet *timesheet) Validate() error {
+func (sheet *Timesheet) Validate() error {
 	if len(sheet.Slices) == 0 {
 		return fmt.Errorf("empty sheets should not occur during normal operation")
 	}
