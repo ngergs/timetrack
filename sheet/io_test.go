@@ -1,4 +1,4 @@
-package main
+package sheet
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -15,10 +15,10 @@ func TestReadWrite(t *testing.T) {
 
 	filename := path.Join(tmpDir, "readwrite.dat")
 	dummyData := "testmessage"
-	err = write(filename, &dummyData)
+	err = Write(filename, &dummyData)
 	assert.Nil(t, err)
-	defer os.Remove(path.Join(resolvedFolder, filename))
-	readData, err := read[string](filename)
+	defer os.Remove(filename)
+	readData, err := Read[string](filename)
 	assert.Nil(t, err)
 	assert.Equal(t, dummyData, *readData)
 }
