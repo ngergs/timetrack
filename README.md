@@ -15,27 +15,33 @@ go build
 
 ## Usage
 Three operation modes are supported:
- - start: Starts a new time tracking session.
- - stop: Stops a previously started session.
- - status: Prints the time tracking session status, the total working hour balance as well as the hours worked today.
- - sheet YYYY-MM-dd: Prints the status command from the retrospective perspective of the specified day (a time sheet has to exist for that day).
+ - begin: Starts a new time tracking session.
+ - begin: Stops a previously started session.
+ - status <YYYY-MM-dd,optional>: Prints the time tracking session status, the total working hour balance as well as the hours worked for the given date. If no date is entered for the optional input the current day is evaluated.
 
 Further options:
 ```
-Usage: ./timetrack {options} (start|stop|status|sheet {date YYYY-MM-DD})
-Options:
-  -compact
-    	whether the status should be printed in a compact format omitting timesheet details
-  -debug
-    	Log debug level
-  -folder string
-    	folder in which the timeekeep time slice are saved (default "~/.timetrack/")
-  -help
-    	Prints the help.
-  -pretty
-    	Activates zerolog pretty logging (default true)
-  -version
-        Prints the version of this program
-  -working-minutes int
-    	daily working minutes to update the time balance (default 480)
+Timetrack is a simple task manager that tracks the time spent working on a single project/job per day.
+It automatically tracks the accumulated overtime. The daily working minutes are by default set to 480minutes=8hours.
+To adjust this just define an alias, e.g. timetrack="timetrack -w 420" for 7hours per day.
+
+Usage:
+  timetrack [command]
+
+Available Commands:
+  begin       Starts a new timetrack sessions
+  completion  Generate the autocompletion script for the specified shell
+  end         Stops the current timetrack session
+  help        Help about any command
+  status      Prints the status of today's timesheet or from the specified date
+  version     Prints the program version
+
+Flags:
+      --debug                     Set the log level to debug
+  -h, --help                      help for timetrack
+      --jsonlog                   Activates zerolog plain json output for the logs
+  -d, --timetrack-folder string   Sets the folder where the timetrack time sheets are stored (default "~/.timetrack/")
+  -w, --working-hours int         Daily working hours used to compute the time balance (default 800)
+
+Use "timetrack [command] --help" for more information about a command.
 ```
