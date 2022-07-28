@@ -39,7 +39,7 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().StringP(timeTrackFolder, "d", "~/.timetrack/", "Sets the folder where the timetrack time sheets are stored")
-	rootCmd.PersistentFlags().IntP(workingHours, "w", 800, "Daily working hours used to compute the time balance")
+	rootCmd.PersistentFlags().IntP(workingHours, "w", 480, "Daily working hours used to compute the time balance")
 	rootCmd.PersistentFlags().Bool(debug, false, "Set the log level to debug")
 	rootCmd.PersistentFlags().Bool(jsonlog, false, "Activates zerolog plain json output for the logs")
 
