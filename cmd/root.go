@@ -14,7 +14,7 @@ import (
 )
 
 const timeTrackFolder = "timetrack-folder"
-const workingHours = "working-hours"
+const workingMinutes = "working-minutes"
 const debug = "debug"
 const jsonlog = "jsonlog"
 
@@ -39,7 +39,7 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().StringP(timeTrackFolder, "d", "~/.timetrack/", "Sets the folder where the timetrack time sheets are stored")
-	rootCmd.PersistentFlags().IntP(workingHours, "w", 480, "Daily working hours used to compute the time balance")
+	rootCmd.PersistentFlags().IntP(workingMinutes, "w", 480, "Daily working time in minutes, used to compute the time balance")
 	rootCmd.PersistentFlags().Bool(debug, false, "Set the log level to debug")
 	rootCmd.PersistentFlags().Bool(jsonlog, false, "Activates zerolog plain json output for the logs")
 
@@ -90,7 +90,7 @@ func loadSheetAndDo(cmd *cobra.Command, date *time.Time, action func(*sheet.Time
 	if err != nil {
 		return fmt.Errorf("could not determine timetrack sheet folder: %w", err)
 	}
-	workingHours, err := cmd.Flags().GetInt(workingHours)
+	workingMinutes, err := cmd.Flags().GetInt(workingMinutes)
 	if err != nil {
 		return fmt.Errorf("could not determine daily working hours: %w", err)
 	}
@@ -99,7 +99,7 @@ func loadSheetAndDo(cmd *cobra.Command, date *time.Time, action func(*sheet.Time
 	if date != nil {
 		current, err = sheet.Read[sheet.Timesheet](path.Join(folder, date.Format(constants.ReferenceFormat)))
 	} else {
-		current, err = sheet.GetCurrentTimesheet(folder, workingHours)
+		current, err = sheet.GetCurrentTimesheet(folder, workingMinutes)
 	}
 	if err != nil {
 		return fmt.Errorf("failed to load timesheet: %w", err)
