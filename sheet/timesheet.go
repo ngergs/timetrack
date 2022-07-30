@@ -2,10 +2,8 @@ package sheet
 
 import (
 	"fmt"
-	"github.com/ngergs/timetrack/v2/constants"
 	"github.com/ngergs/timetrack/v2/sheet/states"
 	"math"
-	"path"
 	"time"
 )
 
@@ -64,15 +62,7 @@ func (sheet *Timesheet) GetTodayBalance() int {
 	return int(math.Floor(balance))
 }
 
-func (sheet *Timesheet) Save(folder string) error {
-	savename := sheet.Slices[0].Start.Format(constants.ReferenceFormat)
-	return Write(path.Join(folder, savename), sheet)
-}
-
 func (sheet *Timesheet) Validate() error {
-	if len(sheet.Slices) == 0 {
-		return fmt.Errorf("empty sheets should not occur during normal operation")
-	}
 	for i, entry := range sheet.Slices {
 		if entry.Start == nil {
 			return fmt.Errorf("time slice with empty start time found")

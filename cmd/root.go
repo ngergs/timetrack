@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/ngergs/timetrack/v2/constants"
+	"github.com/ngergs/timetrack/v2/io"
 	"github.com/ngergs/timetrack/v2/sheet"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -85,7 +86,7 @@ func init() {
 	}
 }
 
-func loadSheetAndDo(cmd *cobra.Command, date *time.Time, action func(*sheet.Timesheet) error) error {
+func loadSheetAndDo(cmd *cobra.Command, date *time.Time, writeChanges bool, action func(*sheet.Timesheet) error) error {
 	folder, err := cmd.Flags().GetString(timeTrackFolder)
 	if err != nil {
 		return fmt.Errorf("could not determine timetrack sheet folder: %w", err)
@@ -95,14 +96,45 @@ func loadSheetAndDo(cmd *cobra.Command, date *time.Time, action func(*sheet.Time
 		return fmt.Errorf("could not determine daily working hours: %w", err)
 	}
 
-	var current *sheet.Timesheet
-	if date != nil {
-		current, err = sheet.Read[sheet.Timesheet](path.Join(folder, date.Format(constants.ReferenceFormat)))
-	} else {
-		current, err = sheet.GetCurrentTimesheet(folder, workingMinutes)
+	file, err := sheet.GetLastSavedFile(folder, date, writeChanges)
+	if err != nil {
+		return err
 	}
+	if file != nil {
+		defer io.Close(file)
+	}
+
+	current, err := sheet.GetLastTimesheet(file)
 	if err != nil {
 		return fmt.Errorf("failed to load timesheet: %w", err)
+	}
+
+	// prepare a save file when the current file lives purely in memory and writing has been requested
+	if writeChanges && file == nil {
+		file, err = io.OpenFile(path.Join(folder, sheet.CurrentDayString), writeChanges)
+		if err != nil {
+			return fmt.Errorf("failed to open new timesheet: %w", err)
+		}
+		defer io.Close(file)
+	}
+
+	if len(current.Slices) > 0 && current.Slices[0].Start.Format(constants.ReferenceFormat) != sheet.CurrentDayString {
+		old := current
+		current, err = sheet.PrepareNewFromOldSheet(current, workingMinutes)
+		// finish old timesheet file and open a new one
+		if writeChanges {
+			newFile, err := io.OpenFile(path.Join(folder, sheet.CurrentDayString), true)
+			if err != nil {
+				return fmt.Errorf("failed to open new timesheet for today: %w", err)
+			}
+			defer io.Close(newFile)
+			// only write changes to the previous file when the new one is successfully opened
+			err = io.Write(file, old)
+			if err != nil {
+				return fmt.Errorf("failed to write closing statement to old timesheet: %w", err)
+			}
+			file = newFile
+		}
 	}
 
 	err = action(current)
@@ -110,9 +142,11 @@ func loadSheetAndDo(cmd *cobra.Command, date *time.Time, action func(*sheet.Time
 		return err
 	}
 
-	err = current.Save(folder)
-	if err != nil {
-		return fmt.Errorf("failed to save modified timesheet: %w", err)
+	if writeChanges {
+		err = io.Write(file, current)
+		if err != nil {
+			return fmt.Errorf("failed to save modified timesheet: %w", err)
+		}
 	}
 	return nil
 }

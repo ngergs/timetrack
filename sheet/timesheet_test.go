@@ -10,8 +10,8 @@ import (
 
 func TestStartStopSession(t *testing.T) {
 	sheet := newTimesheet()
-	// empty sheets are not allowed during normal operation
-	validateExpectError(t, sheet)
+	// empty sheets are ok for new initialization
+	validateExpectOk(t, sheet)
 	assert.Equal(t, 0, len(sheet.Slices))
 	assert.Equal(t, states.Closed, sheet.GetState())
 	startSessionExpectOk(t, sheet, 0)

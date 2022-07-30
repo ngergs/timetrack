@@ -1,9 +1,9 @@
-package sheet
+package io
 
 import (
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"os"
-	"path"
 	"testing"
 )
 
@@ -12,13 +12,14 @@ func TestReadWrite(t *testing.T) {
 	tmpDir := "test/tmp"
 	err := os.MkdirAll(tmpDir, 0755)
 	assert.Nil(t, err)
-
-	filename := path.Join(tmpDir, "readwrite.dat")
 	dummyData := "testmessage"
-	err = Write(filename, &dummyData)
+	file, err := ioutil.TempFile(tmpDir, "testFile")
 	assert.Nil(t, err)
-	defer os.Remove(filename)
-	readData, err := Read[string](filename)
+	defer os.Remove(file.Name())
+
+	err = Write(file, &dummyData)
+	assert.Nil(t, err)
+	readData, err := Read[string](file)
 	assert.Nil(t, err)
 	assert.Equal(t, dummyData, *readData)
 }

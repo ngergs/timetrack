@@ -31,8 +31,13 @@ Returns an error if no such timesheet exists.`,
 				}
 				date = &argDate
 			}
-			err = loadSheetAndDo(cmd, date, func(timesheet *sheet.Timesheet) error {
-				sheet.PrintStatus(timesheet, compact)
+			// pass nil if no date is set to trigger the logic to load the last valid timesheet
+			err = loadSheetAndDo(cmd, date, false, func(timesheet *sheet.Timesheet) error {
+				if date == nil {
+					now := time.Now()
+					date = &now
+				}
+				sheet.PrintStatus(timesheet, date, compact)
 				return nil
 			})
 			if err != nil {
