@@ -1,6 +1,6 @@
 module github.com/ngergs/timetrack/v2
 
-go 1.18
+go 1.19
 
 replace github.com/ngergs/timetrack/v2 => ./
 
