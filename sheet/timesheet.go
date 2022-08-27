@@ -2,9 +2,10 @@ package sheet
 
 import (
 	"fmt"
-	"github.com/ngergs/timetrack/v2/sheet/states"
 	"math"
 	"time"
+
+	"github.com/ngergs/timetrack/v2/sheet/states"
 )
 
 type Timeslice struct {
@@ -13,8 +14,8 @@ type Timeslice struct {
 }
 
 type Timesheet struct {
-	Balance int         `json:"balanceInMinutes"`
 	Slices  []Timeslice `json:"slices"`
+	Balance int         `json:"balanceInMinutes"`
 }
 
 func newTimesheet() *Timesheet {
@@ -56,7 +57,7 @@ func (sheet *Timesheet) GetTodayBalance() int {
 		if entry.End != nil {
 			balance += entry.End.Sub(*entry.Start).Minutes()
 		} else {
-			balance += time.Now().Sub(*entry.Start).Minutes()
+			balance += time.Since(*entry.Start).Minutes()
 		}
 	}
 	return int(math.Floor(balance))

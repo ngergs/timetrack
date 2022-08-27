@@ -2,18 +2,19 @@ package sheet
 
 import (
 	"fmt"
-	"github.com/ngergs/timetrack/v2/constants"
-	"github.com/ngergs/timetrack/v2/io"
-	"github.com/ngergs/timetrack/v2/sheet/states"
-	"github.com/rs/zerolog/log"
 	"os"
 	"path"
 	"regexp"
 	"time"
+
+	"github.com/ngergs/timetrack/v2/constants"
+	"github.com/ngergs/timetrack/v2/io"
+	"github.com/ngergs/timetrack/v2/sheet/states"
+	"github.com/rs/zerolog/log"
 )
 
 var CurrentDayString string = time.Now().Format(constants.ReferenceFormat)
-var filePattern, _ = regexp.Compile("[0-9]{4}-[0-9]{2}-[0-9]{2}\\.json")
+var filePattern, _ = regexp.Compile(`[0-9]{4}-[0-9]{2}-[0-9]{2}\.json`)
 
 func GetLastTimesheet(lastSaved *os.File) (saved *Timesheet, err error) {
 	if lastSaved == nil {

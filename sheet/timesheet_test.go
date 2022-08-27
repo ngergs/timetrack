@@ -1,11 +1,12 @@
 package sheet
 
 import (
-	"github.com/ngergs/timetrack/v2/sheet/states"
-	"github.com/stretchr/testify/assert"
 	"math"
 	"testing"
 	"time"
+
+	"github.com/ngergs/timetrack/v2/sheet/states"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStartStopSession(t *testing.T) {
@@ -30,7 +31,7 @@ func TestStartStopSession(t *testing.T) {
 	assert.Equal(t, 1, len(sheet.Slices))
 	assert.Equal(t, states.Closed, sheet.GetState())
 	assert.NotNil(t, sheet.Slices[0].End)
-	assert.Less(t, time.Now().Sub(*sheet.Slices[0].End).Milliseconds(), int64(100))
+	assert.Less(t, time.Since(*sheet.Slices[0].End).Milliseconds(), int64(100))
 
 	// double stop should fail
 	err = sheet.EndSession()
@@ -66,15 +67,10 @@ func startSessionExpectOk(t *testing.T, sheet *Timesheet, expectedSessionCount i
 	assert.Equal(t, states.Open, sheet.GetState())
 	assert.NotNil(t, sheet.Slices[expectedSessionCount].Start)
 	assert.Nil(t, sheet.Slices[expectedSessionCount].End)
-	assert.Less(t, time.Now().Sub(*sheet.Slices[expectedSessionCount].Start).Milliseconds(), int64(100))
+	assert.Less(t, time.Since(*sheet.Slices[expectedSessionCount].Start).Milliseconds(), int64(100))
 }
 
 func validateExpectOk(t *testing.T, sheet *Timesheet) {
 	err := sheet.Validate()
 	assert.Nil(t, err)
-}
-
-func validateExpectError(t *testing.T, sheet *Timesheet) {
-	err := sheet.Validate()
-	assert.NotNil(t, err)
 }
