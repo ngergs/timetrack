@@ -53,6 +53,7 @@ jobs:
           release-version: ${{ needs.test-and-pre-release.outputs.version }}
           release-version-go-variable: ${{ env.go-version-variable }}
           release-notes-cache-key: ${{ needs.test-and-pre-release.outputs.release-notes-cache-key }}
+          go-build-path: "./cmd/timetrack/"
   release-binary-macos:
     needs: test-and-pre-release
     if: needs.test-and-pre-release.outputs.version != ''
@@ -78,3 +79,4 @@ jobs:
           release-version: ${{ needs.test-and-pre-release.outputs.version }}
           release-version-go-variable: ${{ env.go-version-variable }}
           release-notes-cache-key: ${{ needs.test-and-pre-release.outputs.release-notes-cache-key }}
+          go-build-path: "./cmd/timetrack"
