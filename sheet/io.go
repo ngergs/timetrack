@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/ngergs/timetrack/v2/constants"
-	"github.com/ngergs/timetrack/v2/io"
+	"github.com/ngergs/timetrack/v2/internal/constants"
+	"github.com/ngergs/timetrack/v2/internal/io"
 	"github.com/ngergs/timetrack/v2/sheet/states"
 	"github.com/rs/zerolog/log"
 )

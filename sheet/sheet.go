@@ -2,7 +2,7 @@ package sheet
 
 import (
 	"fmt"
-	"github.com/ngergs/timetrack/v2/constants"
+	"github.com/ngergs/timetrack/v2/internal/constants"
 	"os"
 	"text/tabwriter"
 	"time"
