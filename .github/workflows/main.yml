@@ -2,7 +2,6 @@ name: release
 
 env:
   go-version: '^1.19.0'
-  go-version-variable: 'github.com/ngergs/timetrack/v2/cmd.version'
 
 on:
   push:
@@ -51,7 +50,6 @@ jobs:
           go-os: ${{ matrix.go-os }}
           go-arch: ${{ matrix.go-arch }}
           release-version: ${{ needs.test-and-pre-release.outputs.version }}
-          release-version-go-variable: ${{ env.go-version-variable }}
           release-notes-cache-key: ${{ needs.test-and-pre-release.outputs.release-notes-cache-key }}
           go-build-path: "./cmd/timetrack/"
   release-binary-macos:
@@ -77,6 +75,5 @@ jobs:
           go-os: ${{ matrix.go-os }}
           go-arch: ${{ matrix.go-arch }}
           release-version: ${{ needs.test-and-pre-release.outputs.version }}
-          release-version-go-variable: ${{ env.go-version-variable }}
           release-notes-cache-key: ${{ needs.test-and-pre-release.outputs.release-notes-cache-key }}
           go-build-path: "./cmd/timetrack"
