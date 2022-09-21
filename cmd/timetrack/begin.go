@@ -13,7 +13,7 @@ func init() {
 		Short: "Starts a new timetrack sessions",
 		Long:  `This starts a new timetrack session or reports an error if a session is already open,`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := loadSheetAndDo(cmd, nil, true, func(timesheet *sheet.Timesheet) error {
+			err := loadSheetAndDo(nil, true, func(timesheet *sheet.Timesheet) error {
 				return timesheet.BeginSession()
 			})
 			if err != nil {

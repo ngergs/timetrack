@@ -18,7 +18,7 @@ type Timesheet struct {
 	Balance int         `json:"balanceInMinutes"`
 }
 
-func newTimesheet() *Timesheet {
+func New() *Timesheet {
 	return &Timesheet{
 		Slices: make([]Timeslice, 0),
 	}

@@ -13,7 +13,7 @@ func init() {
 		Short: "Stops the current timetrack session",
 		Long:  `This stops the currently running timetrack session or reports an error if none has been open.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := loadSheetAndDo(cmd, nil, true, func(timesheet *sheet.Timesheet) error {
+			err := loadSheetAndDo(nil, true, func(timesheet *sheet.Timesheet) error {
 				return timesheet.EndSession()
 			})
 			if err != nil {

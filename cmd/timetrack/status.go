@@ -32,7 +32,7 @@ Returns an error if no such timesheet exists.`,
 				date = &argDate
 			}
 			// pass nil if no date is set to trigger the logic to load the last valid timesheet
-			err = loadSheetAndDo(cmd, date, false, func(timesheet *sheet.Timesheet) error {
+			err = loadSheetAndDo(date, false, func(timesheet *sheet.Timesheet) error {
 				if date == nil {
 					now := time.Now()
 					date = &now

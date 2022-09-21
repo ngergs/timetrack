@@ -10,7 +10,7 @@ import (
 )
 
 func TestStartStopSession(t *testing.T) {
-	sheet := newTimesheet()
+	sheet := New()
 	// empty sheets are ok for new initialization
 	validateExpectOk(t, sheet)
 	assert.Equal(t, 0, len(sheet.Slices))
@@ -51,7 +51,7 @@ func TestBalance(t *testing.T) {
 	// update timeDifference to take nanoSeconds drift into account
 	timeDifference = endTime.Sub(startTime)
 
-	sheet := newTimesheet()
+	sheet := New()
 	sheet.Slices = append(sheet.Slices, Timeslice{
 		Start: &startTime,
 		End:   &endTime,

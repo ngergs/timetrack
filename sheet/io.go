@@ -17,16 +17,9 @@ var CurrentDayString string = time.Now().Format(constants.ReferenceFormat)
 var filePattern, _ = regexp.Compile(`[0-9]{4}-[0-9]{2}-[0-9]{2}\.json`)
 
 func GetLastTimesheet(lastSaved *os.File) (saved *Timesheet, err error) {
-	if lastSaved == nil {
-		log.Debug().Msg("No timesheet found, opening a new one")
-		saved = &Timesheet{
-			Slices: make([]Timeslice, 0),
-		}
-	} else {
-		saved, err = io.Read[Timesheet](lastSaved)
-		if err != nil {
-			return nil, fmt.Errorf("could not load timesheet: %w", err)
-		}
+	saved, err = io.Read[Timesheet](lastSaved)
+	if err != nil {
+		return nil, fmt.Errorf("could not load timesheet: %w", err)
 	}
 	return saved, saved.Validate()
 }
