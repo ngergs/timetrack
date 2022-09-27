@@ -155,7 +155,6 @@ func getCurrentTimesheet(date *time.Time, writeChanges bool) (*os.File, *sheet.T
 			if err != nil {
 				return nil, nil, fmt.Errorf("failed to open new timesheet for today: %w", err)
 			}
-			defer io.Close(newFile)
 			// only write changes to the previous file when the new one is successfully opened
 			err = io.Write(file, oldTimesheet)
 			if err != nil {
